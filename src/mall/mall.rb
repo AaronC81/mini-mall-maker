@@ -43,7 +43,7 @@ module GosuGameJam3
     # offset.
     def can_place?(floor, offset, size)
       # Check this is within the bounds of the mall
-      return false if offset + size >= Mall::SLOTS_PER_FLOOR
+      return false if offset + size > Mall::SLOTS_PER_FLOOR
       return false if offset < 0
       return false if floor >= floors
       return false if floor < 0
