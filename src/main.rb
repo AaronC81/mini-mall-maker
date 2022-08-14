@@ -8,9 +8,6 @@ require_relative 'mall/unit'
 require_relative 'mall/units'
 require_relative 'ui/toolbar'
 
-# Not a pixel art game, but not having this has caused problems with upscaling in the past
-Gosu::enable_undocumented_retrofication
-
 $cursor = GosuGameJam3::Point.new(0, 0)
 
 module GosuGameJam3
