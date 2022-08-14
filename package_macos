@@ -1,0 +1,40 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# Prepare folder
+mkdir -p "$SCRIPT_DIR/build"
+[ -e "$SCRIPT_DIR/build/macos" ] && rm -r "$SCRIPT_DIR/build/macos"
+mkdir "$SCRIPT_DIR/build/macos"
+
+# Download template app
+curl https://github.com/gosu/ruby-app/releases/download/v0.14.6.pre1/Ruby.app.zip -L --output "$SCRIPT_DIR/build/macos/template.app.zip"
+unzip "$SCRIPT_DIR/build/macos/template.app.zip" -d "$SCRIPT_DIR/build/macos/app"
+
+# Rename
+mv "$SCRIPT_DIR/build/macos/app/Ruby.app" "$SCRIPT_DIR/build/macos/app/Gosu Game Jam 3.app"
+
+# Modify Info.plist
+INFO_PLIST="$SCRIPT_DIR/build/macos/app/Gosu Game Jam 3.app/Info.plist"
+defaults write "$INFO_PLIST" CFBundleIdentifier -string "cc.aaronc.gosu-game-jam-3"
+defaults write "$INFO_PLIST" CFBundleName -string "Gosu Game Jam 3"
+
+# Copy files in
+RESOURCES="$SCRIPT_DIR/build/macos/app/Gosu Game Jam 3.app/Contents/Resources"
+mkdir "$RESOURCES/src"
+cp -r src/* "$RESOURCES/src"
+mkdir "$RESOURCES/res"
+cp -r res/* "$RESOURCES/res"
+
+# Create our own main
+rm "$RESOURCES/main.rb"
+echo "require_relative 'src/main.rb'" > "$RESOURCES/main.rb"
+
+# Ensure that the Ruby is marked as executable - this was causing problems when testing in a VM!
+chmod +x "$SCRIPT_DIR/build/macos/app/Gosu Game Jam 3.app/Contents/MacOS/Ruby"
+
+# Zip
+pushd "$SCRIPT_DIR/build/macos/app/"
+zip -r "$SCRIPT_DIR/build/macos/app/Gosu Game Jam 3.app.zip" "Gosu Game Jam 3.app"
+popd
