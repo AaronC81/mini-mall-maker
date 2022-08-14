@@ -63,6 +63,7 @@ module GosuGameJam3
             ])
           end
         ],
+        ["Build Floor", -> { $mall.floors += 1 }]
       ])
     end
 
