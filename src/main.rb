@@ -45,9 +45,9 @@ module GosuGameJam3
     end
 
     def draw
-      $mall.units.each do |unit|
-        unit.draw
-      end
+      Gosu.draw_rect(0, 0, WIDTH, HEIGHT, Gosu::Color.new(255, 170, 202, 242))
+
+      $mall.draw 
 
       # If placing unit, draw a hologram of the current position
       if $state.is_a? State::PlacingUnit

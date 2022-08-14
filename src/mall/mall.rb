@@ -6,6 +6,7 @@ module GosuGameJam3
     SLOTS_PER_FLOOR = 30
     FLOOR_HEIGHT = 160
     BOTTOM_FLOOR_Y = 550
+    FLOOR_PADDING = 10
 
     def initialize
       @floors = 1
@@ -18,11 +19,61 @@ module GosuGameJam3
     # All of the units in the mall.
     attr_accessor :units
 
+    def draw
+      # Draw background
+      padding = (WIDTH - (SLOT_WIDTH * SLOTS_PER_FLOOR)) / 2
+      Gosu.draw_rect(
+        padding, BOTTOM_FLOOR_Y + FLOOR_HEIGHT - ((FLOOR_HEIGHT + FLOOR_PADDING) * floors),
+        WIDTH - padding * 2, (FLOOR_HEIGHT + FLOOR_PADDING) * floors,
+        Gosu::Color.new(255, 227, 227, 227),
+      )
+
+      # Draw ground
+      Gosu.draw_rect(
+        0, BOTTOM_FLOOR_Y + FLOOR_HEIGHT,
+        WIDTH, 50,
+        Gosu::Color.new(255, 40, 40, 40),
+      )
+
+      # Draw floor separators
+      (floors - 1).times do |i|
+        Gosu.draw_rect(
+          padding, BOTTOM_FLOOR_Y - (FLOOR_HEIGHT + FLOOR_PADDING) * i - FLOOR_PADDING,
+          WIDTH - padding * 2, FLOOR_PADDING,
+          Gosu::Color.new(255, 40, 40, 40),
+        )
+      end
+
+      # Draw walls
+      Gosu.draw_rect(
+        padding - FLOOR_PADDING, BOTTOM_FLOOR_Y - ((FLOOR_HEIGHT + FLOOR_PADDING) * (floors - 1)),
+        FLOOR_PADDING, (FLOOR_HEIGHT + FLOOR_PADDING) * floors,
+        Gosu::Color.new(255, 40, 40, 40),
+      )
+      Gosu.draw_rect(
+        WIDTH - padding, BOTTOM_FLOOR_Y - ((FLOOR_HEIGHT + FLOOR_PADDING) * (floors - 1)),
+        FLOOR_PADDING, (FLOOR_HEIGHT + FLOOR_PADDING) * floors,
+        Gosu::Color.new(255, 40, 40, 40),
+      )
+
+      # Draw ceiling
+      Gosu.draw_rect(
+        padding - FLOOR_PADDING, BOTTOM_FLOOR_Y - ((FLOOR_HEIGHT + FLOOR_PADDING) * (floors - 1)) - FLOOR_PADDING,
+        WIDTH - (padding - FLOOR_PADDING) * 2, FLOOR_PADDING,
+        Gosu::Color.new(255, 40, 40, 40),
+      )
+
+      # Draw units
+      units.each do |unit|
+        unit.draw
+      end
+    end
+
     # Maps a floor and offset into an engine point where the unit should be located.
     def slot_to_point(floor:, offset:)
       padding = (WIDTH - (SLOT_WIDTH * SLOTS_PER_FLOOR)) / 2
       
-      Point.new(padding + SLOT_WIDTH * offset, BOTTOM_FLOOR_Y - FLOOR_HEIGHT * floor)
+      Point.new(padding + SLOT_WIDTH * offset, BOTTOM_FLOOR_Y - (FLOOR_HEIGHT + FLOOR_PADDING) * floor)
     end
 
     # Maps a point to a floor and offset. Returns [floor, offset], or nil if the cursor is not on a
@@ -30,7 +81,7 @@ module GosuGameJam3
     def point_to_slot(point)
       padding = (WIDTH - (SLOT_WIDTH * SLOTS_PER_FLOOR)) / 2
 
-      floor = (BOTTOM_FLOOR_Y - point.y) / FLOOR_HEIGHT + 1
+      floor = (BOTTOM_FLOOR_Y - point.y) / (FLOOR_HEIGHT + FLOOR_PADDING) + 1
       return nil if floor < 0 || floor >= floors
 
       offset = (point.x - padding) / SLOT_WIDTH
