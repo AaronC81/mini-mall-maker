@@ -1,6 +1,8 @@
 require 'gosu'
 
 require_relative 'engine/point'
+require_relative 'mall/mall'
+require_relative 'mall/unit'
 
 # Not a pixel art game, but not having this has caused problems with upscaling in the past
 Gosu::enable_undocumented_retrofication
@@ -14,6 +16,10 @@ module GosuGameJam3
   class GameWindow < Gosu::Window
     def initialize
       super(WIDTH, HEIGHT)
+
+      $mall = Mall.new
+      $mall.units << Unit.new(floor: 0, offset: 0, size: 3, _temp_colour: Gosu::Color::RED)
+      $mall.units << Unit.new(floor: 0, offset: 4, size: 5, _temp_colour: Gosu::Color::BLUE)
     end
 
     def update
@@ -21,7 +27,9 @@ module GosuGameJam3
     end
 
     def draw
-      Gosu.draw_rect(50, 50, 10, 10, Gosu::Color::RED)
+      $mall.units.each do |unit|
+        unit.draw
+      end
     end
 
     def needs_cursor?
