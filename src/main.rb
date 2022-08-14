@@ -1,21 +1,24 @@
 require 'gosu'
 
 require_relative 'res'
+require_relative 'shapes'
 require_relative 'engine/point'
 require_relative 'mall/mall'
 require_relative 'mall/unit'
+require_relative 'mall/units'
+require_relative 'ui/toolbar'
 
 # Not a pixel art game, but not having this has caused problems with upscaling in the past
 Gosu::enable_undocumented_retrofication
 
 $cursor = GosuGameJam3::Point.new(0, 0)
 
-module State
-  Idle = Struct.new('Idle')
-  PlacingUnit = Struct.new('PlacingUnit', :unit_size, :on_place)
-end 
-
 module GosuGameJam3
+  module State
+    Idle = Struct.new('Idle')
+    PlacingUnit = Struct.new('PlacingUnit', :unit_class)
+  end 
+  
   WIDTH = 1600
   HEIGHT = 900
 
@@ -23,16 +26,22 @@ module GosuGameJam3
     def initialize
       super(WIDTH, HEIGHT)
 
-      $regular_font = Gosu::Font.new(14, name: "Arial") # TODO - bundle font
+      # TODO: bundle fonts
+      $regular_font = Gosu::Font.new(30, name: "Arial")
 
       $state = State::Idle
 
       $mall = Mall.new
-      $mall.units << Unit.new(floor: 0, offset: 6, size: 7, image: Res.image("units/high_end_technology.png"))
+      $mall.units << Units::HighEndTechnology.new(floor: 0, offset: 6)
+
+      @toolbar = Toolbar.new
     end
 
     def update
       $cursor = Point.new(mouse_x.to_i, mouse_y.to_i)
+      @toolbar.tick
+
+      $click = false
     end
 
     def draw
@@ -44,16 +53,18 @@ module GosuGameJam3
       if $state.is_a? State::PlacingUnit
         floor, offset = $mall.point_to_slot($cursor)
         if !floor.nil? && !offset.nil?
-          valid = $mall.can_place?(floor, offset, $state.unit_size)
+          valid = $mall.can_place?(floor, offset, $state.unit_class.size)
           point = $mall.slot_to_point(floor: floor, offset: offset)
 
           Gosu.draw_rect(
             point.x, point.y,
-            $state.unit_size * Mall::SLOT_WIDTH, Mall::FLOOR_HEIGHT,
+            $state.unit_class.size * Mall::SLOT_WIDTH, Mall::FLOOR_HEIGHT,
             valid ? Gosu::Color.new(150, 0, 200, 50) : Gosu::Color.new(150, 255, 0, 0)
           )
         end
       end
+
+      @toolbar.draw
     end
 
     def needs_cursor?
@@ -66,21 +77,16 @@ module GosuGameJam3
       # TODO: Temp
       case id
       when Gosu::MS_LEFT
+        $click = true
+
         case $state
         when State::PlacingUnit
           floor, offset = $mall.point_to_slot($cursor)
-          if !floor.nil? && !offset.nil? && $mall.can_place?(floor, offset, $state.unit_size)
-            $state.on_place.(floor, offset)
+          if !floor.nil? && !offset.nil? && $mall.can_place?(floor, offset, $state.unit_class.size)
+            $mall.units << $state.unit_class.new(floor: floor, offset: offset)
+            $state = State::Idle
           end
         end
-      when Gosu::KB_U
-        $state = State::PlacingUnit.new(
-          3,
-          ->(floor, offset) {
-            p [floor, offset]
-            $state = State::Idle
-          }
-        )
       end 
     end
   end

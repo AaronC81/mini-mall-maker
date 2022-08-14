@@ -1,13 +1,11 @@
 require_relative '../engine/entity'
 
 module GosuGameJam3
-  # A store, facility, etc in the mall.
+  # A store, facility, etc in the mall. Must be used through a derived class.
   class Unit < Entity
-    def initialize(floor:, offset:, size:, image:)
+    def initialize(floor:, offset:)
       @floor = floor
       @offset = offset
-      @size = size
-      @image = image
 
       super(position: $mall.slot_to_point(floor: floor, offset: offset))
     end
@@ -19,10 +17,34 @@ module GosuGameJam3
     attr_accessor :offset
 
     # The number of slots this unit occupies.
-    attr_accessor :size
+    def size
+      self.class.size
+    end
 
-    # The image of this unit. (Overrides Entity's definition.)
-    attr_accessor :image
+    # The image of this unit.
+    def image
+      self.class.image
+    end
+
+    # The image of this unit. This is derived from the class' name, by converting it into snake
+    # case.
+    def self.image
+      # This is ActiveRecord's implementation of CamelCase to snake_case
+      image_name = self.name
+        .split('::')
+        .last
+        .gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2')
+        .gsub(/([a-z\d])([A-Z])/,'\1_\2')
+        .tr("-", "_")
+        .downcase
+  
+      Res.image("units/#{image_name}.png")
+    end
+
+    # The number of slots this unit occupies, calculated from its image.
+    def self.size
+      image.width / Mall::SLOT_WIDTH
+    end
 
     def draw
       image.draw(

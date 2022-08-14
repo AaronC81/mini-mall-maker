@@ -5,7 +5,7 @@ module GosuGameJam3
     SLOT_WIDTH = 50
     SLOTS_PER_FLOOR = 30
     FLOOR_HEIGHT = 160
-    BOTTOM_FLOOR_Y = 600
+    BOTTOM_FLOOR_Y = 550
 
     def initialize
       @floors = 1
