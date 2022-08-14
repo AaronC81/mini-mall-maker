@@ -24,5 +24,10 @@ module GosuGameJam3
     def draw
       Gosu.draw_rect(position.x, position.y, size * Mall::SLOT_WIDTH, Mall::FLOOR_HEIGHT, @_temp_colour)
     end
+
+    # Returns an array of the slot indexes on this floor occupied by this unit.
+    def slots_occupied
+      (offset...(offset + size)).to_a
+    end
   end
 end

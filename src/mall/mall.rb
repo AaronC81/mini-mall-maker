@@ -38,5 +38,24 @@ module GosuGameJam3
 
       [floor, offset]
     end
+
+    # Returns true if it is possible to place a unit with the given size at the given floor and 
+    # offset.
+    def can_place?(floor, offset, size)
+      # Check this is within the bounds of the mall
+      return false if offset + size >= Mall::SLOTS_PER_FLOOR
+      return false if offset < 0
+      return false if floor >= floors
+      return false if floor < 0
+
+      # Check no units on the same floor overlap with this
+      slots_occupied_this = (offset...(offset + size)).to_a
+      units.each do |unit|
+        next if unit.floor != floor
+        return false if (slots_occupied_this & unit.slots_occupied).any?
+      end
+
+      true
+    end
   end
 end
