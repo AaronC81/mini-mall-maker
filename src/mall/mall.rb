@@ -108,5 +108,12 @@ module GosuGameJam3
 
       true
     end
+
+    # Returns the unit which overlaps with the given floor and offset, if any.
+    def unit_at(floor, offset)
+      units.find do |unit|
+        unit.floor == floor && unit.slots_occupied.include?(offset)
+      end
+    end
   end
 end

@@ -21,7 +21,7 @@ module GosuGameJam3
       # Draw background
       Gosu.draw_rect(0, HEIGHT - TOOLBAR_HEIGHT, WIDTH, TOOLBAR_HEIGHT, Gosu::Color::GRAY)
 
-      if $state.is_a? State::PlacingUnit
+      if cancellable_state?
         @cancel_button.draw
       else
         @buttons.each do |button|
@@ -31,7 +31,7 @@ module GosuGameJam3
     end
 
     def tick
-      if $state.is_a? State::PlacingUnit
+      if cancellable_state?
         @cancel_button.tick
       else
         @buttons.each do |button|
@@ -63,7 +63,8 @@ module GosuGameJam3
             ])
           end
         ],
-        ["Build Floor", -> { $mall.floors += 1 }]
+        ["Build Floor", -> { $mall.floors += 1 }],
+        ["Demolish", -> { $state = State::DemolishUnit.new }],
       ])
     end
 
@@ -83,6 +84,10 @@ module GosuGameJam3
     def place(unit_class)
       $state = State::PlacingUnit.new(unit_class)
       open_main_menu
+    end
+
+    def cancellable_state?
+      $state.is_a?(State::PlacingUnit) || $state.is_a?(State::DemolishUnit)
     end
   end
 end
