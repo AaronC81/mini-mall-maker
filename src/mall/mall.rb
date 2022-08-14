@@ -4,7 +4,7 @@ module GosuGameJam3
   class Mall
     SLOT_WIDTH = 50
     SLOTS_PER_FLOOR = 30
-    FLOOR_HEIGHT = 200
+    FLOOR_HEIGHT = 160
     BOTTOM_FLOOR_Y = 600
 
     def initialize

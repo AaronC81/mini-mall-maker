@@ -1,5 +1,6 @@
 require 'gosu'
 
+require_relative 'res'
 require_relative 'engine/point'
 require_relative 'mall/mall'
 require_relative 'mall/unit'
@@ -27,8 +28,7 @@ module GosuGameJam3
       $state = State::Idle
 
       $mall = Mall.new
-      $mall.units << Unit.new(floor: 0, offset: 6, size: 3, _temp_colour: Gosu::Color::RED)
-      $mall.units << Unit.new(floor: 0, offset: 10, size: 5, _temp_colour: Gosu::Color::BLUE)
+      $mall.units << Unit.new(floor: 0, offset: 6, size: 7, image: Res.image("units/high_end_technology.png"))
     end
 
     def update
