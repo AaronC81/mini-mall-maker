@@ -28,9 +28,7 @@ module GosuGameJam3
       $regular_font = Gosu::Font.new(30, name: "Arial")
 
       $state = State::Idle
-
       $mall = Mall.new
-      $mall.units << Units::HighEndTechnology.new(floor: 0, offset: 6)
 
       @toolbar = Toolbar.new
     end
