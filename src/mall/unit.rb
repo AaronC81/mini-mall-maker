@@ -16,6 +16,12 @@ module GosuGameJam3
     # The number of slots away from the far-left of the floor this unit is located.
     attr_accessor :offset
 
+    # The offset where the doorway of this unit is located.
+    # (As opposed to the start of the building, like `offset`.)
+    def doorway_offset
+      offset + size / 2
+    end
+
     # The number of slots this unit occupies.
     def size
       self.class.size

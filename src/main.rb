@@ -7,6 +7,7 @@ require_relative 'mall/mall'
 require_relative 'mall/unit'
 require_relative 'mall/units'
 require_relative 'ui/toolbar'
+require_relative 'customer'
 
 $cursor = GosuGameJam3::Point.new(0, 0)
 
@@ -36,6 +37,7 @@ module GosuGameJam3
     def update
       $cursor = Point.new(mouse_x.to_i, mouse_y.to_i)
       @toolbar.tick
+      $mall.tick
 
       $click = false
     end
@@ -103,6 +105,10 @@ module GosuGameJam3
             $state = State::Idle
           end
         end
+
+      # TODO: temp
+      when Gosu::KB_C
+        $mall.customers << Customer.new(intent: Customer::Intent::Browse.new, position: Point.new(100, Mall::BOTTOM_FLOOR_Y + Mall::FLOOR_HEIGHT - 30))
       end 
     end
   end

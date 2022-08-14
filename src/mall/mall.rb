@@ -11,6 +11,7 @@ module GosuGameJam3
     def initialize
       @floors = 1
       @units = []
+      @customers = []
     end
 
     # The number of floors the mall has.
@@ -18,6 +19,9 @@ module GosuGameJam3
 
     # All of the units in the mall.
     attr_accessor :units
+
+    # The customers in the mall.
+    attr_accessor :customers
 
     def draw
       # Draw background
@@ -63,11 +67,15 @@ module GosuGameJam3
         Gosu::Color.new(255, 40, 40, 40),
       )
 
-      # Draw units
-      units.each do |unit|
-        unit.draw_bg
-        unit.draw_fg
-      end
+      # Draw units and customers
+      units.each(&:draw_bg)
+      customers.filter(&:in_store?).each(&:draw)
+      units.each(&:draw_fg)
+      customers.reject(&:in_store?).each(&:draw)
+    end
+
+    def tick
+      customers.each(&:tick)
     end
 
     # Maps a floor and offset into an engine point where the unit should be located.
@@ -88,7 +96,7 @@ module GosuGameJam3
       offset = (point.x - padding) / SLOT_WIDTH
       return nil if offset < 0 || offset >= SLOTS_PER_FLOOR
 
-      [floor, offset]
+      [floor, offset.floor]
     end
 
     # Returns true if it is possible to place a unit with the given size at the given floor and 
