@@ -107,7 +107,6 @@ module GosuGameJam3
             $mall.units.delete(unit)
             $state = State::Idle
           end
-
         end
       end 
     end

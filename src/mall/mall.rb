@@ -65,7 +65,8 @@ module GosuGameJam3
 
       # Draw units
       units.each do |unit|
-        unit.draw
+        unit.draw_bg
+        unit.draw_fg
       end
     end
 

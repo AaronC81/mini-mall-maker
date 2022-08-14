@@ -21,12 +21,12 @@ module GosuGameJam3
       self.class.size
     end
 
-    # The image of this unit.
+    # The images of this unit.
     def image
       self.class.image
     end
 
-    # The image of this unit. This is derived from the class' name, by converting it into snake
+    # The images of this unit. This is derived from the class' name, by converting it into snake
     # case.
     def self.image
       # This is ActiveRecord's implementation of CamelCase to snake_case
@@ -38,16 +38,28 @@ module GosuGameJam3
         .tr("-", "_")
         .downcase
   
-      Res.image("units/#{image_name}.png")
+      [Res.image("units/#{image_name}_fg.png"), Res.image("units/#{image_name}_bg.png")]
     end
 
     # The number of slots this unit occupies, calculated from its image.
     def self.size
-      image.width / Mall::SLOT_WIDTH
+      # TODO: temporary, only needed during development
+      if image[0].width != image[1].width || image[0].height != image[1].height
+        raise "size mismatch between fg and bg (#{self.name})"
+      end
+
+      image[0].width / Mall::SLOT_WIDTH
     end
 
-    def draw
-      image.draw(
+    def draw_fg
+      image[0].draw(
+        position.x,
+        position.y,
+      )
+    end
+
+    def draw_bg
+      image[1].draw(
         position.x,
         position.y,
       )
