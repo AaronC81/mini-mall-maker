@@ -108,7 +108,14 @@ module GosuGameJam3
 
       # TODO: temp
       when Gosu::KB_C
-        $mall.customers << Customer.new(intent: Customer::Intent::Browse.new, position: Point.new(100, Mall::BOTTOM_FLOOR_Y + Mall::FLOOR_HEIGHT - 30))
+        $mall.customers << Customer.new(
+          intent: Customer::Intent::Browse.new,
+          preferences: Customer::Preferences::new.tap do |p|
+            p.interests = [Customer::Preferences::Department::Fashion]
+            p.budget = [Customer::Preferences::Budget::Discount, Customer::Preferences::Budget::HighEnd].sample
+          end,
+          position: Point.new(100, Mall::BOTTOM_FLOOR_Y + Mall::FLOOR_HEIGHT - 30)
+        )
       end 
     end
   end

@@ -22,16 +22,12 @@ module GosuGameJam3
       offset + size / 2
     end
 
-    # The number of slots this unit occupies.
-    def size
-      self.class.size
-    end
-
-    # The images of this unit.
-    def image
-      self.class.image
-    end
-
+    # Accessors for static methods
+    def size; self.class.size; end
+    def image; self.class.image; end
+    def departments; self.class.departments; end
+    def budget; self.class.budget; end
+    
     # The images of this unit. This is derived from the class' name, by converting it into snake
     # case.
     def self.image
@@ -57,6 +53,24 @@ module GosuGameJam3
       image[0].width / Mall::SLOT_WIDTH
     end
 
+    # The departments which this store has. Abstract: must be overridden by a derived class.
+    def self.departments
+      raise 'abstract'
+    end
+
+    # The budget which this store caters to. Abstract: must be overridden by a derived class.
+    def self.budget
+      raise 'abstract'
+    end
+
+    # A convenience method to define `.departments` and `.budget`.
+    def self.derive_unit(_departments, _budget)
+      self.class_eval do
+        define_method(:departments) { _departments }
+        define_method(:budget) { _budget }
+      end 
+    end
+    
     def draw_fg
       image[0].draw(
         position.x,
