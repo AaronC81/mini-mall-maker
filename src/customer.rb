@@ -78,7 +78,7 @@ module GosuGameJam3
           # Generate a list of subactions, if we've just moved into this item in the queue
           if action.subactions == nil
             action.subactions = []
-            rand(4..7).times do |i|
+            (rand(2..3) * 2).times do |i|
               if i.even?
                 # Pick a random point within the unit to move to
                 point = (unit.position.x..(unit.position.x + unit.size * Mall::SLOT_WIDTH)).to_a.sample
