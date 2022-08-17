@@ -7,11 +7,16 @@ module GosuGameJam3
     FLOOR_HEIGHT = 160
     BOTTOM_FLOOR_Y = 550
     FLOOR_PADDING = 10
-
+    
     def initialize
       @floors = 1
       @units = []
       @customers = []
+      @popularity = 100
+      @interest_reputation = Customer::Preferences::Department.all.map { |i| [i, 10.0] }.to_h
+      @budget_reputation = Customer::Preferences::Budget.all.map { |i| [i, 10.0] }.to_h
+
+      @ticks_until_next_customer = 500
     end
 
     # The number of floors the mall has.
@@ -22,6 +27,20 @@ module GosuGameJam3
 
     # The customers in the mall.
     attr_accessor :customers
+
+    # The overall popularity of the mall, acting as a global multiplier to the number of customers
+    # who visit.
+    attr_accessor :popularity
+
+    # The relative popularity of this mall for people with particular interests. Customers will be
+    # more likely to have interests with a higher reputation.
+    # A hash of { interest => reputation }. The reputation values do not add up to 1 or anything
+    # like that!
+    attr_accessor :interest_reputation
+
+    # The relative popularity of this mall for people with particular budgets. Same format as 
+    # `interest_reputation`.
+    attr_accessor :budget_reputation
 
     def draw
       # Draw background
@@ -76,6 +95,12 @@ module GosuGameJam3
 
     def tick
       customers.each(&:tick)
+
+      @ticks_until_next_customer -= 1
+      if @ticks_until_next_customer <= 0
+        customers << Customer.generate
+        @ticks_until_next_customer = (1.0 / popularity) * 5000 * rand(0.5..1.5)
+      end
     end
 
     # Maps a floor and offset into an engine point where the unit should be located.
