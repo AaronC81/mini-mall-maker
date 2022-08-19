@@ -1,3 +1,5 @@
+require_relative 'ui/floating_text'
+
 module GosuGameJam3
   class Customer < Entity
     HEIGHT = 30
@@ -194,8 +196,24 @@ module GosuGameJam3
             action.subactions.shift if value <= 0
           end
 
-          # If we've completed all subactions, shift the action
-          actions.shift if action.subactions.empty?
+          # If we've completed all subactions...
+          if action.subactions.empty?
+            # Decide whether we're going to buy something
+            if rand < unit.purchase_chance
+              # Yep! Decide on a value, add to money, and create a little text thing
+              value = unit.purchase_range.to_a.sample
+              $mall.money += value
+
+              $mall.misc_entities << FloatingText.new(
+                text: Utils.format_money(value),
+                colour: Gosu::Color.rgb(0, 225, 50),
+                position: self.position + Point.new(0, -15)
+              )
+            end
+
+            # Shift the action to do something else
+            actions.shift 
+          end
           
         when Action::Leave
           if (position.x - $mall.slot_to_point(floor: 0, offset: 0).x).abs < speed * 2
@@ -222,7 +240,7 @@ module GosuGameJam3
           actions << Action::LookAroundUnit.new
           considered_units << unit
           self.has_done_anything = true
-          break
+          return
         else
           considered_units << unit
         end

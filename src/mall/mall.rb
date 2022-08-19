@@ -12,6 +12,7 @@ module GosuGameJam3
       @floors = 1
       @units = []
       @customers = []
+      @misc_entities = []
       @popularity = 100
       @interest_reputation = Customer::Preferences::Department.all.map { |i| [i, 10.0] }.to_h
       @budget_reputation = Customer::Preferences::Budget.all.map { |i| [i, 10.0] }.to_h
@@ -28,6 +29,9 @@ module GosuGameJam3
 
     # The customers in the mall.
     attr_accessor :customers
+
+    # Miscallenous entities which the mall will draw and tick.
+    attr_accessor :misc_entities
 
     # The overall popularity of the mall, acting as a global multiplier to the number of customers
     # who visit.
@@ -95,6 +99,9 @@ module GosuGameJam3
       customers.filter(&:in_store?).each(&:draw)
       units.each(&:draw_fg)
       customers.reject(&:in_store?).each(&:draw)
+
+      # Draw other entities
+      misc_entities.each(&:draw)
     end
 
     def tick
@@ -105,6 +112,9 @@ module GosuGameJam3
         customers << Customer.generate
         @ticks_until_next_customer = (1.0 / popularity) * 5000 * rand(0.5..1.5)
       end
+
+      # Tick other entities
+      misc_entities.each(&:tick)
     end
 
     # Maps a floor and offset into an engine point where the unit should be located.

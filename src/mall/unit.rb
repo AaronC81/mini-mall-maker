@@ -27,6 +27,8 @@ module GosuGameJam3
     def image; self.class.image; end
     def departments; self.class.departments; end
     def budget; self.class.budget; end
+    def purchase_chance; self.class.purchase_chance; end
+    def purchase_range; self.class.purchase_range; end
     
     # The images of this unit. This is derived from the class' name, by converting it into snake
     # case.
@@ -54,25 +56,27 @@ module GosuGameJam3
     end
 
     # The departments which this store has. Abstract: must be overridden by a derived class.
-    def self.departments
-      raise 'abstract'
-    end
+    def self.departments; raise 'abstract'; end
 
     # The budget which this store caters to. Abstract: must be overridden by a derived class.
-    def self.budget
-      raise 'abstract'
-    end
+    def self.budget; raise 'abstract'; end
 
     # The cost of building this store.
-    def self.build_cost
-      raise 'abstract'
-    end 
+    def self.build_cost; raise 'abstract'; end 
 
-    # A convenience method to define `.departments` and `.budget`.
-    def self.derive_unit(_departments, _budget, _build_cost)
+    # The chance, as a ratio, that a customer will buy something from this unit after entering.
+    def self.purchase_chance; raise 'abstract'; end
+
+    # The range of prices which a customer may pay when buying something from this unit. 
+    def self.purchase_range; raise 'abstract'; end
+
+    # A convenience method to define properties of this unit.
+    def self.derive_unit(_departments, _budget, _build_cost, _purchase_chance, _purchase_range)
       define_singleton_method(:departments) { _departments }
       define_singleton_method(:budget) { _budget }
       define_singleton_method(:build_cost) { _build_cost }
+      define_singleton_method(:purchase_chance) { _purchase_chance }
+      define_singleton_method(:purchase_range) { _purchase_range }
     end
     
     def draw_fg
