@@ -1,6 +1,7 @@
 require_relative 'button'
 require_relative '../engine/point'
 require_relative '../mall/units'
+require_relative '../utils'
 
 module GosuGameJam3
   class Toolbar
@@ -28,6 +29,19 @@ module GosuGameJam3
           button.draw
         end
       end
+
+      # Print money (heh)
+      money_reading = Utils.format_money($mall.money)
+      money_width = $regular_font.text_width(money_reading)
+      $regular_font.draw_text(
+        money_reading,
+        WIDTH - money_width - 20,
+        HEIGHT - TOOLBAR_HEIGHT + 25,
+        10,
+        1,
+        1,
+        Gosu::Color::BLACK,
+      )
     end
 
     def tick
@@ -48,15 +62,15 @@ module GosuGameJam3
               [
                 "Fashion...", ->do
                   open_buttons([
-                    ["Discount", -> { place(Units::DiscountClothes) }],
-                    ["Designer", -> { place(Units::DesignerClothes) }],
+                    ["Discount", Units::DiscountClothes],
+                    ["Designer", Units::DesignerClothes],
                   ])
                 end
               ],
               [
                 "Technology...", ->do
                   open_buttons([
-                    ["High-end", -> { place(Units::HighEndTechnology) }],
+                    ["High-end", Units::HighEndTechnology],
                   ])
                 end
               ],
@@ -71,12 +85,22 @@ module GosuGameJam3
     def open_buttons(buttons)
       @buttons = []
       buttons.each.with_index do |(text, click), i|
+        # `click` special cases
+        unless click.is_a?(Proc)
+          if click < Unit
+            unit = click
+            cost = unit.build_cost
+            click = -> { place(unit) }
+          end
+        end
+
         @buttons << Button.new(
           width: 200,
           height: 60,
           text: text,
           position: Point.new(10 + 210 * (i / 2), HEIGHT - TOOLBAR_HEIGHT + (i.even? ? 10 : 80)),
           on_click: click,
+          cost: cost,
         )
       end
     end

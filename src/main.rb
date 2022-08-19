@@ -93,8 +93,9 @@ module GosuGameJam3
         case $state
         when State::PlacingUnit
           floor, offset = $mall.point_to_slot($cursor)
-          if !floor.nil? && !offset.nil? && $mall.can_place?(floor, offset, $state.unit_class.size)
+          if !floor.nil? && !offset.nil? && $mall.can_place?(floor, offset, $state.unit_class.size) && $mall.money >= $state.unit_class.build_cost
             $mall.units << $state.unit_class.new(floor: floor, offset: offset)
+            $mall.money -= $state.unit_class.build_cost
             $state = State::Idle
           end
 

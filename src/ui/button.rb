@@ -1,11 +1,12 @@
 require_relative '../engine/entity'
 require_relative 'tooltip'
+require_relative '../utils'
 
 module GosuGameJam3
   class Button < Entity
     include Tooltip
 
-    def initialize(width: nil, height: nil, text: nil, image: nil, on_click: nil, enabled: nil, tooltip: nil, **kw)
+    def initialize(width: nil, height: nil, text: nil, image: nil, on_click: nil, enabled: nil, tooltip: nil, cost: nil, **kw)
       super(**kw)
       @width = width
       @height = height
@@ -18,6 +19,7 @@ module GosuGameJam3
       @on_click = on_click
       @enabled = enabled || ->{ true }
       @tooltip = tooltip
+      @cost = cost
     end
 
     attr_accessor :width
@@ -34,6 +36,10 @@ module GosuGameJam3
 
     # An image to display instead of the standard button text.
     attr_accessor :image
+
+    # The price of the item this button is associated with. If the player's money is below this,
+    # the button will not be clickable. (Clicking the button does not reduce money.)
+    attr_accessor :cost
 
     def background_colour
       return Gosu::Color::BLACK unless enabled.()
@@ -60,19 +66,39 @@ module GosuGameJam3
         # Draw text
         text_width = $regular_font.text_width(text)
         text_height = $regular_font.height * (text.chars.select { |x| x == "\n" }.count + 1)
-        $regular_font.draw_text(
-          text,
-          position.x + (width - text_width) / 2,
-          position.y + (height - text_height) / 2,
-          2
-        )
+        if cost
+          text_height += $regular_font.height
+          $regular_font.draw_text(
+            text,
+            position.x + (width - text_width) / 2,
+            position.y + (height - text_height) / 2,
+            2
+          )
+          formatted_cost = Utils.format_money(cost)
+          $regular_font.draw_text(
+            formatted_cost,
+            position.x + (width - $regular_font.text_width(formatted_cost)) / 2,
+            position.y + (height - text_height) / 2 + $regular_font.height,
+            2,
+            1,
+            1,
+            $mall.money >= cost ? Gosu::Color::WHITE : Gosu::Color::RED,
+          )
+        else
+          $regular_font.draw_text(
+            text,
+            position.x + (width - text_width) / 2,
+            position.y + (height - text_height) / 2,
+            2
+          )
+        end
       end
 
       draw_tooltip
     end
 
     def tick
-      if $click && point_inside?($cursor) && enabled.()
+      if $click && point_inside?($cursor) && enabled.() && (cost ? $mall.money >= cost : true)
         on_click&.()
         $click = false
       end

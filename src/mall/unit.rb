@@ -63,12 +63,16 @@ module GosuGameJam3
       raise 'abstract'
     end
 
+    # The cost of building this store.
+    def self.build_cost
+      raise 'abstract'
+    end 
+
     # A convenience method to define `.departments` and `.budget`.
-    def self.derive_unit(_departments, _budget)
-      self.class_eval do
-        define_method(:departments) { _departments }
-        define_method(:budget) { _budget }
-      end 
+    def self.derive_unit(_departments, _budget, _build_cost)
+      define_singleton_method(:departments) { _departments }
+      define_singleton_method(:budget) { _budget }
+      define_singleton_method(:build_cost) { _build_cost }
     end
     
     def draw_fg

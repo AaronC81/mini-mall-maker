@@ -15,6 +15,7 @@ module GosuGameJam3
       @popularity = 100
       @interest_reputation = Customer::Preferences::Department.all.map { |i| [i, 10.0] }.to_h
       @budget_reputation = Customer::Preferences::Budget.all.map { |i| [i, 10.0] }.to_h
+      @money = 10000
 
       @ticks_until_next_customer = 500
     end
@@ -41,6 +42,9 @@ module GosuGameJam3
     # The relative popularity of this mall for people with particular budgets. Same format as 
     # `interest_reputation`.
     attr_accessor :budget_reputation
+
+    # The amount of money the player has.
+    attr_accessor :money
 
     def draw
       # Draw background
