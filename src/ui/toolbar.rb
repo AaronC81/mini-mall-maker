@@ -95,7 +95,7 @@ module GosuGameJam3
             ])
           end
         ],
-        ["Build Floor", -> { $mall.floors += 1 }],
+        ["Build Floor", :build_floor],
         ["Demolish", -> { $state = State::DemolishUnit.new }],
       ], top_level: true)
     end
@@ -103,12 +103,26 @@ module GosuGameJam3
     def open_buttons(buttons, top_level: false)
       @buttons = []
       buttons.each.with_index do |(text, click), i|
+        highlighted = false
         # `click` special cases
         unless click.is_a?(Proc)
-          if click < Unit
+          if click.is_a?(Class) && click < Unit
             unit = click
             cost = unit.build_cost
             click = -> { place(unit) }
+          elsif click == :build_floor
+            if $mall.floors < Mall::MAX_FLOORS
+              cost = Mall::FLOOR_UPGRADE_COSTS[$mall.floors]
+              click = ->do
+                $mall.money -= Mall::FLOOR_UPGRADE_COSTS[$mall.floors]
+                $mall.floors += 1
+                open_main_menu
+              end
+            else
+              text = "Max Floors"
+              highlighted = true
+              click = ->{}
+            end
           end
         end
 
@@ -119,6 +133,7 @@ module GosuGameJam3
           position: Point.new(70 + 210 * (i / 2), HEIGHT - TOOLBAR_HEIGHT + (i.even? ? 10 : 80)),
           on_click: click,
           cost: cost,
+          highlighted: highlighted,
         )
       end
 

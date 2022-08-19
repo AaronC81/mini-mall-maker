@@ -6,7 +6,7 @@ module GosuGameJam3
   class Button < Entity
     include Tooltip
 
-    def initialize(width: nil, height: nil, text: nil, image: nil, on_click: nil, enabled: nil, tooltip: nil, cost: nil, **kw)
+    def initialize(width: nil, height: nil, text: nil, image: nil, on_click: nil, enabled: nil, tooltip: nil, cost: nil, highlighted: false, **kw)
       super(**kw)
       @width = width
       @height = height
@@ -20,7 +20,7 @@ module GosuGameJam3
       @enabled = enabled || ->{ true }
       @tooltip = tooltip
       @cost = cost
-      @highlighted = false
+      @highlighted = highlighted
     end
 
     attr_accessor :width
