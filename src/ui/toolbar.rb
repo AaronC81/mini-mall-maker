@@ -13,7 +13,20 @@ module GosuGameJam3
         height: 60,
         text: "Cancel",
         position: Point.new(70, HEIGHT - TOOLBAR_HEIGHT + 10),
-        on_click: -> { $state = State::Idle },
+        on_click: -> { $state = State::Idle.new },
+      )
+      @sentiment_button = Button.new(
+        width: 100,
+        height: 60,
+        text: "Snt.",
+        position: Point.new(WIDTH - 110, HEIGHT - TOOLBAR_HEIGHT + 80),
+        on_click: ->do
+          unless $state.is_a?(State::SentimentReport)
+            $state = State::SentimentReport.new
+          else
+            $state = State::Idle.new
+          end
+        end,
       )
       open_main_menu
     end
@@ -30,12 +43,14 @@ module GosuGameJam3
         end
       end
 
+      @sentiment_button.draw
+
       # Print money (heh)
       money_reading = Utils.format_money($mall.money)
       money_width = $regular_font.text_width(money_reading)
       $regular_font.draw_text(
         money_reading,
-        WIDTH - money_width - 20,
+        WIDTH - money_width - 10,
         HEIGHT - TOOLBAR_HEIGHT + 25,
         10,
         1,
@@ -52,6 +67,9 @@ module GosuGameJam3
           button.tick
         end
       end
+
+      @sentiment_button.tick
+      @sentiment_button.highlighted = $state.is_a?(State::SentimentReport)
     end
 
     def open_main_menu

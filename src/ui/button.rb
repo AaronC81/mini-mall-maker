@@ -20,6 +20,7 @@ module GosuGameJam3
       @enabled = enabled || ->{ true }
       @tooltip = tooltip
       @cost = cost
+      @highlighted = false
     end
 
     attr_accessor :width
@@ -41,10 +42,13 @@ module GosuGameJam3
     # the button will not be clickable. (Clicking the button does not reduce money.)
     attr_accessor :cost
 
+    # Whether this button is constantly its hover colour.
+    attr_accessor :highlighted
+
     def background_colour
       return Gosu::Color::BLACK unless enabled.()
 
-      if point_inside?($cursor)
+      if point_inside?($cursor) || highlighted
         Gosu::Color.rgb(70, 65, 50)
       else
         Gosu::Color.rgb(132, 116, 95)

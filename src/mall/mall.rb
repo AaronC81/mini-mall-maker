@@ -13,12 +13,14 @@ module GosuGameJam3
       @units = []
       @customers = []
       @misc_entities = []
+      @sentiments = []
       @popularity = 100
       @interest_reputation = Customer::Preferences::Department.all.map { |i| [i, 10.0] }.to_h
       @budget_reputation = Customer::Preferences::Budget.all.map { |i| [i, 10.0] }.to_h
       @money = 10000
 
       @ticks_until_next_customer = 500
+      @ticks = 0
     end
 
     # The number of floors the mall has.
@@ -49,6 +51,18 @@ module GosuGameJam3
 
     # The amount of money the player has.
     attr_accessor :money
+
+    # The time since the game started, in ticks.
+    attr_accessor :ticks
+
+    # An array of customer sentiments about the mall.
+    attr_accessor :sentiments
+
+    def add_sentiment(kind, message)
+      sentiments << Customer::Sentiment.new(kind, message, ticks)
+    end
+    def add_positive_sentiment(message); add_sentiment(:positive, message); end
+    def add_negative_sentiment(message); add_sentiment(:negative, message); end
 
     def draw
       # Draw background
@@ -115,6 +129,7 @@ module GosuGameJam3
 
       # Tick other entities
       misc_entities.each(&:tick)
+      self.ticks += 1
     end
 
     # Maps a floor and offset into an engine point where the unit should be located.

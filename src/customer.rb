@@ -49,9 +49,14 @@ module GosuGameJam3
       end
   
       class Department
-        Fashion = new
-        Technology = new
+        def initialize(name)
+          @name = name
+        end
+        attr_reader :name
 
+        Fashion = new("fashion")
+        Technology = new("technology")
+          
         def self.all
           [Fashion, Technology]
         end
@@ -69,6 +74,8 @@ module GosuGameJam3
       attr_accessor :interests
     end  
 
+    Sentiment = Struct.new('Sentiment', :kind, :message, :ticks)
+
     def initialize(intent:, preferences:, **kw)
       @base_intent = intent
       @immediate_intent = nil
@@ -76,6 +83,7 @@ module GosuGameJam3
       @speed = 1.5
       @preferences = preferences
       @considered_units = []
+      @visited_units = []
       @has_done_anything = false
 
       super(**kw)
@@ -125,6 +133,9 @@ module GosuGameJam3
 
     # The units which this customer has already visited, or considered and decided not to visit.
     attr_accessor :considered_units
+
+    # The units which this customer has already visited. A subset of `considered_units`.
+    attr_accessor :visited_units
 
     # Whether this customer has done anything. Even if they visit with no relevant interests,
     # they'll always do something before they leave - even just walking to a random unit
@@ -239,6 +250,7 @@ module GosuGameJam3
           actions << Action::WalkTo.new(unit.doorway_offset)
           actions << Action::LookAroundUnit.new
           considered_units << unit
+          visited_units << unit
           self.has_done_anything = true
           return
         else
@@ -252,7 +264,25 @@ module GosuGameJam3
       if !has_done_anything
         actions << Action::WalkTo.new(rand((Mall::SLOTS_PER_FLOOR - 5)...Mall::SLOTS_PER_FLOOR))
         self.has_done_anything = true
+
+        budget = {
+          Preferences::Budget::Discount => "discount ",
+          Preferences::Budget::HighEnd => "high-end ",
+        }[preferences.budget] || ""
+
+        preferences.interests.each do |i|
+          $mall.add_negative_sentiment("I wish there were more #{budget}#{i.name} stores here.")
+        end
       else
+        if visited_units.any?
+          most_visited_dept, visits = visited_units.flat_map(&:departments).tally.max_by { |_, v| v }
+          if visits > 1
+            $mall.add_positive_sentiment("I love all of the #{most_visited_dept.name} stores here!")
+          else
+            $mall.add_positive_sentiment("The #{most_visited_dept.name} store here is great!")
+          end
+        end
+
         # TODO: when multiple floors, we need to go to the bottom one first
         actions << Action::Leave.new
       end

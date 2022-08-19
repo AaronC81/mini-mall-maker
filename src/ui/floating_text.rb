@@ -25,6 +25,8 @@ module GosuGameJam3
     end
 
     def draw
+      return if $state.is_a?(State::SentimentReport)
+
       $regular_font.draw_text(text, position.x, position.y, 1000, 1, 1, colour)
     end
   end

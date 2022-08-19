@@ -16,6 +16,7 @@ module GosuGameJam3
     Idle = Struct.new('Idle')
     PlacingUnit = Struct.new('PlacingUnit', :unit_class)
     DemolishUnit = Struct.new('DemolishUnit')
+    SentimentReport = Struct.new('SentimentReport')
   end 
   
   WIDTH = 1600
@@ -74,6 +75,43 @@ module GosuGameJam3
             Gosu::Color.new(150, 0, 50, 200),
           )
         end
+
+      when State::SentimentReport
+        # Draw background
+        width_padding = 200
+        height_padding = 30
+        Gosu.draw_rect(
+          width_padding, height_padding,
+          WIDTH - width_padding * 2, HEIGHT - Toolbar::TOOLBAR_HEIGHT - height_padding * 2,
+          Gosu::Color.new(255, 240, 240, 240),
+        )
+        Gosu.draw_outline_rect(
+          width_padding, height_padding,
+          WIDTH - width_padding * 2, HEIGHT - Toolbar::TOOLBAR_HEIGHT - height_padding * 2,
+          Gosu::Color::BLACK, 3
+        )
+
+        # Write most widely-held sentiments
+        sentiment_counts = {}
+        $mall.sentiments.each do |s|
+          sentiment_counts[s.message] ||= [0, s.kind]
+          sentiment_counts[s.message][0] += 1
+        end
+        sentiment_counts = sentiment_counts.sort_by { |_, (v, _)| v }.reverse.to_h
+        spacing = $regular_font.height * 1.2
+
+        sentiment_counts.take(20).each.with_index do |(text, (count, kind)), i|
+          $regular_font.draw_text(
+            count.to_s,
+            width_padding + 10, height_padding + 10 + i * spacing, 100,
+            1, 1, Gosu::Color::BLACK,
+          )
+          $regular_font.draw_text(
+            text,
+            width_padding + 80, height_padding + 10 + i * spacing, 100,
+            1, 1, kind == :positive ? Gosu::Color.rgb(0, 170, 50) : Gosu::Color::rgb(225, 20, 0),
+          )
+        end
       end
 
       @toolbar.draw
@@ -96,14 +134,14 @@ module GosuGameJam3
           if !floor.nil? && !offset.nil? && $mall.can_place?(floor, offset, $state.unit_class.size) && $mall.money >= $state.unit_class.build_cost
             $mall.units << $state.unit_class.new(floor: floor, offset: offset)
             $mall.money -= $state.unit_class.build_cost
-            $state = State::Idle
+            $state = State::Idle.new
           end
 
         when State::DemolishUnit
           floor, offset = $mall.point_to_slot($cursor)
           if !floor.nil? && !offset.nil? && (unit = $mall.unit_at(floor, offset))
             $mall.units.delete(unit)
-            $state = State::Idle
+            $state = State::Idle.new
           end
         end
       end
