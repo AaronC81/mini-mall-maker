@@ -12,7 +12,7 @@ module GosuGameJam3
         width: 200,
         height: 60,
         text: "Cancel",
-        position: Point.new(10, HEIGHT - TOOLBAR_HEIGHT + 10),
+        position: Point.new(70, HEIGHT - TOOLBAR_HEIGHT + 10),
         on_click: -> { $state = State::Idle },
       )
       open_main_menu
@@ -79,10 +79,10 @@ module GosuGameJam3
         ],
         ["Build Floor", -> { $mall.floors += 1 }],
         ["Demolish", -> { $state = State::DemolishUnit.new }],
-      ])
+      ], top_level: true)
     end
 
-    def open_buttons(buttons)
+    def open_buttons(buttons, top_level: false)
       @buttons = []
       buttons.each.with_index do |(text, click), i|
         # `click` special cases
@@ -98,9 +98,19 @@ module GosuGameJam3
           width: 200,
           height: 60,
           text: text,
-          position: Point.new(10 + 210 * (i / 2), HEIGHT - TOOLBAR_HEIGHT + (i.even? ? 10 : 80)),
+          position: Point.new(70 + 210 * (i / 2), HEIGHT - TOOLBAR_HEIGHT + (i.even? ? 10 : 80)),
           on_click: click,
           cost: cost,
+        )
+      end
+
+      unless top_level
+        @buttons << Button.new(
+          width: 50,
+          height: TOOLBAR_HEIGHT - 20,
+          text: "<",
+          position: Point.new(10, HEIGHT - TOOLBAR_HEIGHT + 10),
+          on_click: -> { open_main_menu },
         )
       end
     end
