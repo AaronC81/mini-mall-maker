@@ -190,6 +190,7 @@ module GosuGameJam3
                 )
                 $mall.floors += 1
                 open_main_menu
+                Res.sample('audio/place.wav').play(0.15)
               end
             else
               text = "Max Floors"

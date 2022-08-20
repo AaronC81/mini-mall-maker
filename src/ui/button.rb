@@ -103,6 +103,7 @@ module GosuGameJam3
 
     def tick
       if $click && point_inside?($cursor) && enabled.() && (cost ? $mall.money >= cost : true)
+        Res.sample('audio/click.wav').play(0.2)
         on_click&.()
         $click = false
       end

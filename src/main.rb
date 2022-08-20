@@ -34,6 +34,8 @@ module GosuGameJam3
       $mall = Mall.new
 
       @toolbar = Toolbar.new
+
+      Res.song('audio/music.wav').play(true)
     end
 
     def update
@@ -169,6 +171,7 @@ module GosuGameJam3
               position: $cursor,
             )
             $state = State::Idle.new
+            Res.sample('audio/place.wav').play(0.15)
           end
 
         when State::DemolishUnit
