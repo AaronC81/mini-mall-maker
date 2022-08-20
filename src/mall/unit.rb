@@ -78,6 +78,15 @@ module GosuGameJam3
       define_singleton_method(:purchase_chance) { _purchase_chance }
       define_singleton_method(:purchase_range) { _purchase_range }
     end
+  
+    # A convenience method to define that a unit doesn't have an image yet.
+    def self.image_todo
+      define_method(:draw_fg) {}
+      define_singleton_method(:size) { 1 }
+      define_method(:draw_bg) do
+        Gosu.draw_rect(position.x, position.y, Mall::SLOT_WIDTH, Mall::FLOOR_HEIGHT, Gosu::Color::RED)
+      end 
+    end
     
     def draw_fg
       image[0].draw(

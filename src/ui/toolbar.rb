@@ -96,15 +96,47 @@ module GosuGameJam3
               [
                 "Fashion...", nil, ->do
                   open_buttons([
-                    ["Discount", nil, Units::DiscountClothes],
-                    ["Designer", nil, Units::DesignerClothes],
+                    ["Fast Fashion", nil, Units::DiscountClothes],
+                    ["Designer Brand", nil, Units::DesignerClothes],
+                    ["Shoes", nil, Units::Shoes],
                   ])
                 end
               ],
               [
                 "Technology...", nil, ->do
                   open_buttons([
-                    ["High-end", nil, Units::HighEndTechnology],
+                    ["High-end Tech", nil, Units::HighEndTechnology],
+                    ["Used Tech", nil, Units::UsedTechnology],
+                    ["Phone Cases", nil, Units::PhoneCases],
+                  ])
+                end
+              ],
+              [
+                "Toys and\nGames...", nil, ->do
+                  open_buttons([
+                    ["General Toys", nil, Units::GeneralToys],
+                    ["Plushies", nil, Units::PlushToys],
+                    ["Building Bricks", nil, Units::BuildingBlockToys],
+                    ["Video Games", nil, Units::VideoGames],
+                  ])
+                end
+              ],
+              [
+                "Health and\nBeauty...", nil, ->do
+                  open_buttons([
+                    ["Pharmacy", nil, Units::Pharmacy],
+                    ["Cosmetics", nil, Units::Cosmetics],
+                    ["Luxury Soap", nil, Units::LuxurySoap],
+                  ])
+                end
+              ],
+              [
+                "Food...", nil, ->do
+                  open_buttons([
+                    ["Bakery", nil, Units::Bakery],
+                    ["Donuts", nil, Units::Donuts],
+                    ["Burritos", nil, Units::Burritos],
+                    ["Fine Dining", nil, Units::FineDining],
                   ])
                 end
               ],

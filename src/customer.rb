@@ -58,12 +58,15 @@ module GosuGameJam3
 
         Fashion = new("fashion")
         Technology = new("technology")
+        Toys = new("toys and games")
+        Health = new("health and beauty")
+        Food  = new("food")
 
         # Assigned only to utilities like elevators
         Special = new("???")
           
         def self.all
-          [Fashion, Technology]
+          [Fashion, Technology, Toys, Health, Food]
         end
       end
 

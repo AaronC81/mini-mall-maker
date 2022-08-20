@@ -10,9 +10,9 @@ module GosuGameJam3
 
     MAX_FLOORS = 4
     FLOOR_UPGRADE_COSTS = {
-      1 => 15000,
-      2 => 30000,
-      3 => 45000,
+      1 => 3000,
+      2 => 5000,
+      3 => 7000,
     }
     
     def initialize
@@ -24,7 +24,7 @@ module GosuGameJam3
       @popularity = 100
       @interest_reputation = Customer::Preferences::Department.all.map { |i| [i, 10.0] }.to_h
       @budget_reputation = Customer::Preferences::Budget.all.map { |i| [i, 10.0] }.to_h
-      @money = ENV['BIG_MONEY'] ? 1000000000 : 10000
+      @money = ENV['BIG_MONEY'] ? 1000000000 : 2500
 
       @ticks_until_next_customer = 500
       @ticks = 0

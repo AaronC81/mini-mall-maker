@@ -113,6 +113,7 @@ module GosuGameJam3
           .map { |i| i.name.capitalize }
           .tally
           .sort_by { |_, v| v }
+          .reverse
           .to_h
         spacing = $regular_font.height * 1.2
 
