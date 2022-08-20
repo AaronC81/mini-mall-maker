@@ -3,7 +3,7 @@ require_relative 'ui/floating_text'
 module GosuGameJam3
   class Customer < Entity
     HEIGHT = 30
-    VARIANTS = 1
+    VARIANTS = 11
 
     module Intent
       Browse = Struct.new('Browse')
