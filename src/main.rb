@@ -17,6 +17,7 @@ module GosuGameJam3
     PlacingUnit = Struct.new('PlacingUnit', :unit_class)
     DemolishUnit = Struct.new('DemolishUnit')
     SentimentReport = Struct.new('SentimentReport')
+    CustomerReport = Struct.new('CustomerReport')
   end 
   
   WIDTH = 1600
@@ -78,18 +79,7 @@ module GosuGameJam3
 
       when State::SentimentReport
         # Draw background
-        width_padding = 200
-        height_padding = 30
-        Gosu.draw_rect(
-          width_padding, height_padding,
-          WIDTH - width_padding * 2, HEIGHT - Toolbar::TOOLBAR_HEIGHT - height_padding * 2,
-          Gosu::Color.new(255, 240, 240, 240),
-        )
-        Gosu.draw_outline_rect(
-          width_padding, height_padding,
-          WIDTH - width_padding * 2, HEIGHT - Toolbar::TOOLBAR_HEIGHT - height_padding * 2,
-          Gosu::Color::BLACK, 3
-        )
+        width_padding, height_padding = draw_report_bg
 
         # Write most widely-held sentiments
         sentiment_counts = {}
@@ -112,6 +102,44 @@ module GosuGameJam3
             1, 1, kind == :positive ? Gosu::Color.rgb(0, 170, 50) : Gosu::Color::rgb(225, 20, 0),
           )
         end
+
+      when State::CustomerReport
+        # Draw background
+        width_padding, height_padding = draw_report_bg
+
+        # Write most widely-held interests
+        interest_counts = $mall.customers
+          .flat_map { |c| c.preferences.interests }
+          .map { |i| i.name.capitalize }
+          .tally
+          .sort_by { |_, v| v }
+          .to_h
+        spacing = $regular_font.height * 1.2
+
+        $regular_font.draw_text(
+          "#{$mall.customers.length} customers here now",
+          width_padding + 10, height_padding + 10, 100,
+          1, 1, Gosu::Color::BLACK,
+        )
+        $regular_font.draw_text(
+          "Interests:",
+          width_padding + 10, height_padding + 65, 100,
+          1, 1, Gosu::Color::BLACK,
+        )
+
+        interest_counts.take(12).each.with_index do |(text, count), i|
+          $regular_font.draw_text(
+            count.to_s,
+            width_padding + 10, height_padding + 100 + i * spacing, 100,
+            1, 1, Gosu::Color::BLACK,
+          )
+          $regular_font.draw_text(
+            text,
+            width_padding + 80, height_padding + 100 + i * spacing, 100,
+            1, 1, Gosu::Color::BLACK,
+          )
+        end
+
       end
 
       @toolbar.draw
@@ -145,6 +173,23 @@ module GosuGameJam3
           end
         end
       end
+    end
+
+    def draw_report_bg
+      width_padding = 200
+      height_padding = 30
+      Gosu.draw_rect(
+        width_padding, height_padding,
+        WIDTH - width_padding * 2, HEIGHT - Toolbar::TOOLBAR_HEIGHT - height_padding * 2,
+        Gosu::Color.new(255, 240, 240, 240),
+      )
+      Gosu.draw_outline_rect(
+        width_padding, height_padding,
+        WIDTH - width_padding * 2, HEIGHT - Toolbar::TOOLBAR_HEIGHT - height_padding * 2,
+        Gosu::Color::BLACK, 3
+      )
+
+      [width_padding, height_padding]
     end
   end
 end

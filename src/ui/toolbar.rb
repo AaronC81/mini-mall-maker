@@ -16,13 +16,26 @@ module GosuGameJam3
         on_click: -> { $state = State::Idle.new },
       )
       @sentiment_button = Button.new(
-        width: 100,
+        width: 50,
         height: 60,
         text: "Snt.",
-        position: Point.new(WIDTH - 110, HEIGHT - TOOLBAR_HEIGHT + 80),
+        position: Point.new(WIDTH - 140, HEIGHT - TOOLBAR_HEIGHT + 80),
         on_click: ->do
           unless $state.is_a?(State::SentimentReport)
             $state = State::SentimentReport.new
+          else
+            $state = State::Idle.new
+          end
+        end,
+      )
+      @customers_button = Button.new(
+        width: 50,
+        height: 60,
+        text: "Cst.",
+        position: Point.new(WIDTH - 70, HEIGHT - TOOLBAR_HEIGHT + 80),
+        on_click: ->do
+          unless $state.is_a?(State::CustomerReport)
+            $state = State::CustomerReport.new
           else
             $state = State::Idle.new
           end
@@ -44,6 +57,7 @@ module GosuGameJam3
       end
 
       @sentiment_button.draw
+      @customers_button.draw
 
       # Print money (heh)
       money_reading = Utils.format_money($mall.money)
@@ -70,6 +84,8 @@ module GosuGameJam3
 
       @sentiment_button.tick
       @sentiment_button.highlighted = $state.is_a?(State::SentimentReport)
+      @customers_button.tick
+      @customers_button.highlighted = $state.is_a?(State::CustomerReport)
     end
 
     def open_main_menu
