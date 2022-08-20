@@ -117,7 +117,7 @@ module GosuGameJam3
 
       # Draw units and customers
       units.each(&:draw_bg)
-      customers.filter(&:in_store?).each(&:draw)
+      customers.select(&:in_store?).each(&:draw)
       units.each(&:draw_fg)
       customers.reject(&:in_store?).each(&:draw)
 
@@ -199,7 +199,7 @@ module GosuGameJam3
         
       # Find the closest elevator on this floor which can take us to our floor
       closest_elevator = units
-        .filter { |u| u.is_a?(Units::Elevator) && u.floor == from_floor && elevator_floors_reachable(u).include?(to_floor) }
+        .select { |u| u.is_a?(Units::Elevator) && u.floor == from_floor && elevator_floors_reachable(u).include?(to_floor) }
         .min_by { |u| (u.offset - from_offset).abs }
       return nil if closest_elevator.nil?
 
@@ -208,7 +208,7 @@ module GosuGameJam3
 
     def elevator_floors_reachable(unit)
       units
-        .filter { |u| u.is_a?(Units::Elevator) && u.offset == unit.offset }
+        .select { |u| u.is_a?(Units::Elevator) && u.offset == unit.offset }
         .map(&:floor)
     end
   end

@@ -66,7 +66,7 @@ module GosuGameJam3
 
       if $state.is_a?(State::Splash)
         logo = Res.image('logo.png')
-        logo.draw((WIDTH - logo.width) / 2, 50)
+        logo.draw((WIDTH - logo.width) / 2, 50, 100)
 
         $regular_font.draw_text("Created by Aaron Christiansen for Gosu Game Jam 3", 480, 750, 100)
         $regular_font.draw_text("Music: Matthew Pablo on OpenGameArt.org", 530, 820, 100)

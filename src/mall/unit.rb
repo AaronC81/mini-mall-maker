@@ -93,6 +93,7 @@ module GosuGameJam3
       image[0].draw(
         position.x,
         position.y,
+        0,
       )
       draw_tooltip
     end
@@ -101,6 +102,7 @@ module GosuGameJam3
       image[1].draw(
         position.x,
         position.y,
+        0,
       )
     end
 

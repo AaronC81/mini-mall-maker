@@ -113,7 +113,7 @@ module GosuGameJam3
     # attracts.
     def self.generate
       weighted_sample = ->hash do
-        total = hash.values.sum
+        total = hash.values.inject(:+)
         cumulative = 0.0
         value_lookup = hash.to_a.map do |this_value, this_weight|
           entry = [cumulative..(cumulative + this_weight), this_value]
@@ -171,7 +171,8 @@ module GosuGameJam3
       super
       decide_next_action if actions.empty?
 
-      if (floor, offset = $mall.point_to_slot(position))
+      if (location = $mall.point_to_slot(position))
+        floor, offset = location
         unit = $mall.unit_at(floor, offset)
         action = actions.first
         case action
@@ -295,7 +296,8 @@ module GosuGameJam3
 
         if rand < chance_to_enter(unit)
           considered_units << unit
-          if (floor, offset = $mall.point_to_slot(position))
+          if (location = $mall.point_to_slot(position))
+            floor, offset = location
             path_result = $mall.pathfind(floor, offset, unit.floor, unit.offset)
             if path_result == :same
               actions << Action::WalkTo.new(unit.doorway_offset)
@@ -344,7 +346,8 @@ module GosuGameJam3
         end
 
         # Time to properly leave - go to the far left of the bottom floor
-        if (floor, offset = $mall.point_to_slot(position))
+        if (location = $mall.point_to_slot(position))
+          floor, offset = location
           path_result = $mall.pathfind(floor, offset, 0, 0)
           if path_result.is_a?(Integer)
             actions << Action::WalkTo.new(path_result)
