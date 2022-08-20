@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+shopt -s extglob
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
@@ -13,28 +14,28 @@ curl https://github.com/gosu/ruby-app/releases/download/v0.14.6.pre1/Ruby.app.zi
 unzip "$SCRIPT_DIR/build/macos/template.app.zip" -d "$SCRIPT_DIR/build/macos/app"
 
 # Rename
-mv "$SCRIPT_DIR/build/macos/app/Ruby.app" "$SCRIPT_DIR/build/macos/app/Gosu Game Jam 3.app"
+mv "$SCRIPT_DIR/build/macos/app/Ruby.app" "$SCRIPT_DIR/build/macos/app/Mini Mall Maker.app"
 
 # Modify Info.plist
-INFO_PLIST="$SCRIPT_DIR/build/macos/app/Gosu Game Jam 3.app/Info.plist"
-defaults write "$INFO_PLIST" CFBundleIdentifier -string "cc.aaronc.gosu-game-jam-3"
-defaults write "$INFO_PLIST" CFBundleName -string "Gosu Game Jam 3"
+INFO_PLIST="$SCRIPT_DIR/build/macos/app/Mini Mall Maker.app/Info.plist"
+defaults write "$INFO_PLIST" CFBundleIdentifier -string "cc.aaronc.mini-mall-maker"
+defaults write "$INFO_PLIST" CFBundleName -string "Mini Mall Maker"
 
 # Copy files in
-RESOURCES="$SCRIPT_DIR/build/macos/app/Gosu Game Jam 3.app/Contents/Resources"
+RESOURCES="$SCRIPT_DIR/build/macos/app/Mini Mall Maker.app/Contents/Resources"
 mkdir "$RESOURCES/src"
 cp -r src/* "$RESOURCES/src"
 mkdir "$RESOURCES/res"
-cp -r res/* "$RESOURCES/res"
+cp -r res/!(*.sketch) "$RESOURCES/res"
 
 # Create our own main
 rm "$RESOURCES/main.rb"
 echo "require_relative 'src/main.rb'" > "$RESOURCES/main.rb"
 
 # Ensure that the Ruby is marked as executable - this was causing problems when testing in a VM!
-chmod +x "$SCRIPT_DIR/build/macos/app/Gosu Game Jam 3.app/Contents/MacOS/Ruby"
+chmod +x "$SCRIPT_DIR/build/macos/app/Mini Mall Maker.app/Contents/MacOS/Ruby"
 
 # Zip
 pushd "$SCRIPT_DIR/build/macos/app/"
-zip -r "$SCRIPT_DIR/build/macos/app/Gosu Game Jam 3.app.zip" "Gosu Game Jam 3.app"
+zip -r "$SCRIPT_DIR/build/macos/app/Mini Mall Maker.app.zip" "Mini Mall Maker.app"
 popd
