@@ -38,15 +38,19 @@ module GosuGameJam3
       @current_animation&.tick
     end
 
+    def draw_centred?
+      true
+    end
+
     def draw
       return unless image
 
       image.draw_rot(
         position.x + (mirror_x ? image.width * scaling : 0), position.y, position.z,
-        rotation, 0.5, 0.5,
+        rotation, draw_centred? ? 0.5 : 0, draw_centred? ? 0.5 : 0,
         scaling * (mirror_x ? -1 : 1),
         scaling,
-        Gosu::Color.new(opacity, 255, 255, 255),
+        Gosu::Color.new(opacity * 255, 255, 255, 255),
       )
     end
 

@@ -3,6 +3,7 @@ require_relative 'ui/floating_text'
 module GosuGameJam3
   class Customer < Entity
     HEIGHT = 30
+    VARIANTS = 1
 
     module Intent
       Browse = Struct.new('Browse')
@@ -80,7 +81,7 @@ module GosuGameJam3
 
     Sentiment = Struct.new('Sentiment', :kind, :message, :ticks)
 
-    def initialize(intent:, preferences:, **kw)
+    def initialize(variant:, intent:, preferences:, **kw)
       @base_intent = intent
       @immediate_intent = nil
       @actions = [] 
@@ -90,7 +91,19 @@ module GosuGameJam3
       @visited_units = []
       @has_done_anything = false
 
-      super(**kw)
+      super(animations: {
+        walk: Animation.new([
+          Res.image("customers/var#{variant}/stage1.png"),
+          Res.image("customers/var#{variant}/stage2.png"),
+          Res.image("customers/var#{variant}/stage3.png"),
+          Res.image("customers/var#{variant}/stage4.png"),
+        ], 8),
+        idle: Animation.static(Res.image("customers/var#{variant}/idle.png"))
+      }, **kw)
+    end
+
+    def draw_centred?
+      false
     end
 
     # Randomly generates and returns a new customer, based on the kind of customers which the mall
@@ -116,6 +129,7 @@ module GosuGameJam3
           interests: rand(1..3).times.map { weighted_sample.($mall.interest_reputation) }.uniq,
         ),
         position: $mall.slot_to_point(floor: 0, offset: 0) + Point.new(0, Mall::FLOOR_HEIGHT - HEIGHT),
+        variant: rand(0..(VARIANTS - 1)) + 1,
       )
     end
 
@@ -145,18 +159,12 @@ module GosuGameJam3
     # they'll always do something before they leave - even just walking to a random unit
     attr_accessor :has_done_anything
 
-    def draw
-      Gosu.draw_rect(
-        position.x, position.y, 15, HEIGHT,
-        in_store? ? Gosu::Color.new(opacity * 255, 160, 0, 0) : Gosu::Color.new(opacity * 255, 255, 0, 0)
-      )
-    end
-
     def in_store?
       actions.first.is_a?(Action::LookAroundUnit)
     end
 
     def tick
+      super
       decide_next_action if actions.empty?
 
       # TODO: handle nil case
@@ -165,14 +173,17 @@ module GosuGameJam3
         action = actions.first
         case action
         when Action::WalkTo
+          self.animation = :walk
           if action.offset == offset
             # We've reached our destination!
             actions.shift
           elsif action.offset > offset
             # We need to move right
+            self.mirror_x = false
             self.position.x += speed
           elsif action.offset < offset
             # We need to move left
+            self.mirror_x = true
             self.position.x -= speed
           end
 
@@ -204,14 +215,18 @@ module GosuGameJam3
           task, value = action.subactions.first
           case task
           when :move
+            self.animation = :walk
             if (position.x - value).abs < speed * 2
               action.subactions.shift
             elsif value > position.x
+              self.mirror_x = false
               position.x += speed
             elsif value < position.x
+              self.mirror_x = true
               position.x -= speed
             end
           when :wait
+            self.animation = :idle
             action.subactions.first[1] -= 1 
             action.subactions.shift if value <= 0
           end
@@ -241,10 +256,13 @@ module GosuGameJam3
             $mall.customers.delete(self)
           else
             # Keep moving
+            self.animation = :walk
+            self.mirror_x = true
             position.x -= speed
           end
 
         when Action::TakeElevator
+          self.animation = :idle
           if action.ticks == 30
             diff = action.floor - floor
             position.y -= diff * (Mall::FLOOR_HEIGHT + Mall::FLOOR_PADDING)
