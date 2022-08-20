@@ -49,11 +49,6 @@ module GosuGameJam3
 
     # The number of slots this unit occupies, calculated from its image.
     def self.size
-      # TODO: temporary, only needed during development
-      if image[0].width != image[1].width || image[0].height != image[1].height
-        raise "size mismatch between fg and bg (#{self.name})"
-      end
-
       image[0].width / Mall::SLOT_WIDTH
     end
 

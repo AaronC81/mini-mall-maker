@@ -27,7 +27,6 @@ module GosuGameJam3
     def initialize
       super(WIDTH, HEIGHT)
 
-      # TODO: bundle fonts
       $regular_font = Gosu::Font.new(30, name: "Arial")
 
       $state = State::Idle

@@ -171,7 +171,6 @@ module GosuGameJam3
       super
       decide_next_action if actions.empty?
 
-      # TODO: handle nil case
       if (floor, offset = $mall.point_to_slot(position))
         unit = $mall.unit_at(floor, offset)
         action = actions.first
