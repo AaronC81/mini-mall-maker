@@ -75,34 +75,41 @@ module GosuGameJam3
     def open_main_menu
       open_buttons([
         [
-          "Build Stores", ->do
+          "Build Stores...", "Build a variety of stores for your customers to visit.", ->do
             open_buttons([
               [
-                "Fashion...", ->do
+                "Fashion...", nil, ->do
                   open_buttons([
-                    ["Discount", Units::DiscountClothes],
-                    ["Designer", Units::DesignerClothes],
+                    ["Discount", nil, Units::DiscountClothes],
+                    ["Designer", nil, Units::DesignerClothes],
                   ])
                 end
               ],
               [
-                "Technology...", ->do
+                "Technology...", nil, ->do
                   open_buttons([
-                    ["High-end", Units::HighEndTechnology],
+                    ["High-end", nil, Units::HighEndTechnology],
                   ])
                 end
               ],
             ])
           end
         ],
-        ["Build Floor", :build_floor],
-        ["Demolish", -> { $state = State::DemolishUnit.new }],
+        [
+          "Build Utilities...", "Build extra facilities which your mall needs.", ->do
+            open_buttons([
+              ["Elevator", "Elevators let customers move between floors.\nThey must be placed in the same position on each floor.", Units::Elevator],
+            ])
+          end
+        ],
+        ["Build Floor", "Build a new floor. You will also need to build elevators\n(in Utilities) to allow customers to get there.", :build_floor],
+        ["Demolish", "Destroy something you have built.", -> { $state = State::DemolishUnit.new }],
       ], top_level: true)
     end
 
     def open_buttons(buttons, top_level: false)
       @buttons = []
-      buttons.each.with_index do |(text, click), i|
+      buttons.each.with_index do |(text, tooltip, click), i|
         highlighted = false
         # `click` special cases
         unless click.is_a?(Proc)
@@ -134,6 +141,7 @@ module GosuGameJam3
           on_click: click,
           cost: cost,
           highlighted: highlighted,
+          tooltip: tooltip,
         )
       end
 

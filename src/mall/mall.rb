@@ -185,5 +185,31 @@ module GosuGameJam3
         unit.floor == floor && unit.slots_occupied.include?(offset)
       end
     end
+
+    # Pathfinds from one floor and offset to another, using one elevator shaft if required.
+    # 
+    # Returns one of the following:
+    #   - :same, if the locations are on the same floor.
+    #   - an offset, the location of an elevator, if an elevator is required and exists to
+    #       traverse from the current to destination floor.
+    #   - nil, if it is not possible to traverse to the destination using one elevator shaft.
+    def pathfind(from_floor, from_offset, to_floor, to_offset)
+      # Are we on the right floor already? If so, this is easy
+      return :same if from_floor == to_floor
+        
+      # Find the closest elevator on this floor which can take us to our floor
+      closest_elevator = units
+        .filter { |u| u.is_a?(Units::Elevator) && u.floor == from_floor && elevator_floors_reachable(u).include?(to_floor) }
+        .min_by { |u| (u.offset - from_offset).abs }
+      return nil if closest_elevator.nil?
+
+      closest_elevator.offset
+    end
+
+    def elevator_floors_reachable(unit)
+      units
+        .filter { |u| u.is_a?(Units::Elevator) && u.offset == unit.offset }
+        .map(&:floor)
+    end
   end
 end

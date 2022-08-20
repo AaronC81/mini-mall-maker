@@ -15,5 +15,9 @@ module GosuGameJam3
     class HighEndTechnology < Unit
       derive_unit([D::Technology], B::HighEnd, 12000, 0.025, 500..2000)
     end
+
+    class Elevator < Unit
+      derive_unit([D::Special], B::Any, 1000, 0, 0..0)
+    end
   end
 end

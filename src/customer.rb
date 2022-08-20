@@ -12,6 +12,7 @@ module GosuGameJam3
       WalkTo = Struct.new('WalkTo', :offset)
       Leave = Struct.new('Leave')
       LookAroundUnit = Struct.new('LookAroundUnit', :subactions)
+      TakeElevator = Struct.new('TakeElevator', :floor, :ticks)
     end
 
     class Preferences
@@ -56,6 +57,9 @@ module GosuGameJam3
 
         Fashion = new("fashion")
         Technology = new("technology")
+
+        # Assigned only to utilities like elevators
+        Special = new("???")
           
         def self.all
           [Fashion, Technology]
@@ -144,7 +148,7 @@ module GosuGameJam3
     def draw
       Gosu.draw_rect(
         position.x, position.y, 15, HEIGHT,
-        in_store? ? Gosu::Color.new(255, 160, 0, 0) : Gosu::Color.new(255, 255, 0, 0)
+        in_store? ? Gosu::Color.new(opacity * 255, 160, 0, 0) : Gosu::Color.new(opacity * 255, 255, 0, 0)
       )
     end
 
@@ -173,6 +177,11 @@ module GosuGameJam3
           end
 
         when Action::LookAroundUnit
+          if unit.nil?
+            actions.shift
+            return
+          end
+
           # Generate a list of subactions, if we've just moved into this item in the queue
           if action.subactions == nil
             action.subactions = []
@@ -234,8 +243,26 @@ module GosuGameJam3
             # Keep moving
             position.x -= speed
           end
+
+        when Action::TakeElevator
+          if action.ticks == 30
+            diff = action.floor - floor
+            position.y -= diff * (Mall::FLOOR_HEIGHT + Mall::FLOOR_PADDING)
+          elsif action.ticks == 0
+            self.opacity = 1
+            actions.shift
+          elsif action.ticks < 30
+            self.opacity = 1 - (action.ticks.to_f / 30)
+          elsif action.ticks < 60
+            self.opacity = (action.ticks.to_f - 30) / 30
+          end
+
+          action.ticks -= 1
           
         end
+      else
+        puts "Warning: Customer at #{position} is out of bounds, deleting"
+        $mall.customers.delete(self)
       end
     end
 
@@ -246,12 +273,24 @@ module GosuGameJam3
         next if considered_units.include?(unit)
 
         if rand < chance_to_enter(unit)
-          raise 'multiple floors nyi' if unit.floor > 0 # TODO
-          actions << Action::WalkTo.new(unit.doorway_offset)
-          actions << Action::LookAroundUnit.new
           considered_units << unit
-          visited_units << unit
-          self.has_done_anything = true
+          if (floor, offset = $mall.point_to_slot(position))
+            path_result = $mall.pathfind(floor, offset, unit.floor, unit.offset)
+            if path_result == :same
+              actions << Action::WalkTo.new(unit.doorway_offset)
+            elsif path_result.nil?
+              $mall.add_negative_sentiment("I can't reach the #{unit.departments.first.name} store!")
+              redo
+            else
+              actions << Action::WalkTo.new(path_result)
+              actions << Action::TakeElevator.new(unit.floor, 60)
+              actions << Action::WalkTo.new(unit.doorway_offset)
+            end
+            actions << Action::LookAroundUnit.new
+
+            visited_units << unit
+            self.has_done_anything = true
+          end
           return
         else
           considered_units << unit
@@ -283,7 +322,14 @@ module GosuGameJam3
           end
         end
 
-        # TODO: when multiple floors, we need to go to the bottom one first
+        # Time to properly leave - go to the far left of the bottom floor
+        if (floor, offset = $mall.point_to_slot(position))
+          path_result = $mall.pathfind(floor, offset, 0, 0)
+          if path_result.is_a?(Integer)
+            actions << Action::WalkTo.new(path_result)
+            actions << Action::TakeElevator.new(0, 60)
+          end
+        end
         actions << Action::Leave.new
       end
     end
