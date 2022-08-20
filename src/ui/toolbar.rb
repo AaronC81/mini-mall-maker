@@ -7,6 +7,11 @@ module GosuGameJam3
   class Toolbar
     TOOLBAR_HEIGHT = 150
 
+    AdvertisingMethod = Struct.new('AdvertisingMethod', :description, :interests, :cost)
+    AM = AdvertisingMethod
+
+    D = Customer::Preferences::Department
+
     def initialize
       @cancel_button = Button.new(
         width: 200,
@@ -151,6 +156,14 @@ module GosuGameJam3
           end
         ],
         ["Build Floor", "Build a new floor. You will also need to build elevators\n(in Utilities) to allow customers to get there.", :build_floor],
+        ["Advertising...", "Increase your mall's popularity, and target specific interests.", ->do
+          open_buttons([
+            ["Newspaper", nil, AM.new("General-purpose marketing.", [], 400)],
+            ["Influencers", nil, AM.new("Attract trendy, fashion-focused customers.", [D::Fashion, D::Health], 600)],
+            ["In-Game Ad", nil, AM.new("Advertise to gadget and gaming lovers.", [D::Technology, D::Toys], 600)],
+            ["Meal Coupons", nil, AM.new("Get people to come and eat at your mall.", [D::Food], 400)],
+          ])
+        end],
         ["Demolish", "Destroy something you have built.", -> { $state = State::DemolishUnit.new }],
       ], top_level: true)
     end
@@ -177,6 +190,17 @@ module GosuGameJam3
               text = "Max Floors"
               highlighted = true
               click = ->{}
+            end
+          elsif click.is_a?(AdvertisingMethod)
+            cost = click.cost
+            tooltip = click.description
+            interests = click.interests
+            click = ->do
+              $mall.money -= cost
+              $mall.popularity *= 1.25
+              interests.each do |interest|
+                $mall.interest_reputation[interest] += 5
+              end
             end
           end
         end

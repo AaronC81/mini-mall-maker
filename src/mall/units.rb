@@ -13,7 +13,7 @@ module GosuGameJam3
       derive_unit([D::Fashion], B::Discount, 800, 0.9, 10..30)
     end
     class Shoes < Unit
-      derive_unit([D::Fashion], B::Intermediate, 500, 0.4, 40..100)
+      derive_unit([D::Fashion], B::Intermediate, 500, 0.4, 40..80)
       image_todo
     end
 
