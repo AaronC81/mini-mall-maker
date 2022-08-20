@@ -84,11 +84,11 @@ module GosuGameJam3
 
     Sentiment = Struct.new('Sentiment', :kind, :message, :ticks)
 
-    def initialize(variant:, intent:, preferences:, **kw)
+    def initialize(variant:, intent:, preferences:, speed:, **kw)
       @base_intent = intent
       @immediate_intent = nil
       @actions = [] 
-      @speed = 1.5
+      @speed = speed
       @preferences = preferences
       @considered_units = []
       @visited_units = []
@@ -100,7 +100,7 @@ module GosuGameJam3
           Res.image("customers/var#{variant}/stage2.png"),
           Res.image("customers/var#{variant}/stage3.png"),
           Res.image("customers/var#{variant}/stage4.png"),
-        ], 8),
+        ], 11 - (speed * 2).round),
         idle: Animation.static(Res.image("customers/var#{variant}/idle.png"))
       }, **kw)
     end
@@ -133,6 +133,7 @@ module GosuGameJam3
         ),
         position: $mall.slot_to_point(floor: 0, offset: 0) + Point.new(0, Mall::FLOOR_HEIGHT - HEIGHT),
         variant: rand(0..(VARIANTS - 1)) + 1,
+        speed: rand(1.0..1.6),
       )
     end
 
