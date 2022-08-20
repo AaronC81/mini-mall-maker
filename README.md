@@ -1,4 +1,4 @@
-# Gosu Game Jam 3
+# Mini Mall Maker
 
 ## Running
 
