@@ -8,11 +8,13 @@ require_relative 'mall/unit'
 require_relative 'mall/units'
 require_relative 'ui/toolbar'
 require_relative 'customer'
+require_relative 'engine/transition'
 
 $cursor = GosuGameJam3::Point.new(0, 0)
 
 module GosuGameJam3
   module State
+    Splash = Struct.new('Splash', :ticks)
     Idle = Struct.new('Idle')
     PlacingUnit = Struct.new('PlacingUnit', :unit_class)
     DemolishUnit = Struct.new('DemolishUnit')
@@ -29,15 +31,29 @@ module GosuGameJam3
 
       $regular_font = Gosu::Font.new(30, name: "Arial")
 
-      $state = State::Idle
+      $state = State::Splash.new(0)
       $mall = Mall.new
 
       @toolbar = Toolbar.new
+      @transition = Transition.new
 
       Res.song('audio/music.wav').play(true)
     end
 
     def update
+      @transition.tick
+
+      if $state.is_a?(State::Splash)
+        $state.ticks += 1
+        if $state.ticks == 180
+          @transition.fade_out(30) do
+            $state = State::Idle.new
+            @transition.fade_in(30) {}
+          end
+        end
+        return
+      end
+
       $cursor = Point.new(mouse_x.to_i, mouse_y.to_i)
       @toolbar.tick
       $mall.tick
@@ -46,6 +62,19 @@ module GosuGameJam3
     end
 
     def draw
+      @transition.draw
+
+      if $state.is_a?(State::Splash)
+        logo = Res.image('logo.png')
+        logo.draw((WIDTH - logo.width) / 2, 50)
+
+        $regular_font.draw_text("Created by Aaron Christiansen for Gosu Game Jam 3", 480, 750, 100)
+        $regular_font.draw_text("Music: Matthew Pablo on OpenGameArt.org", 530, 820, 100)
+        $regular_font.draw_text("(More credits on itch.io game page)", 580, 860, 100)
+
+        return 
+      end
+
       Gosu.draw_rect(0, 0, WIDTH, HEIGHT, Gosu::Color.new(255, 170, 202, 242))
 
       $mall.draw 
