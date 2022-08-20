@@ -120,7 +120,6 @@ module GosuGameJam3
                 "Toys and\nGames...", nil, ->do
                   open_buttons([
                     ["General Toys", nil, Units::GeneralToys],
-                    ["Plushies", nil, Units::PlushToys],
                     ["Building Bricks", nil, Units::BuildingBlockToys],
                     ["Video Games", nil, Units::VideoGames],
                   ])
@@ -140,7 +139,6 @@ module GosuGameJam3
                   open_buttons([
                     ["Bakery", nil, Units::Bakery],
                     ["Donuts", nil, Units::Donuts],
-                    ["Burritos", nil, Units::Burritos],
                     ["Fine Dining", nil, Units::FineDining],
                   ])
                 end
