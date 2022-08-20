@@ -163,6 +163,11 @@ module GosuGameJam3
           if !floor.nil? && !offset.nil? && $mall.can_place?(floor, offset, $state.unit_class.size) && $mall.money >= $state.unit_class.build_cost
             $mall.units << $state.unit_class.new(floor: floor, offset: offset)
             $mall.money -= $state.unit_class.build_cost
+            $mall.misc_entities << FloatingText.new(
+              text: "-#{Utils.format_money($state.unit_class.build_cost)}",
+              colour: Gosu::Color::RED,
+              position: $cursor,
+            )
             $state = State::Idle.new
           end
 

@@ -183,6 +183,11 @@ module GosuGameJam3
               cost = Mall::FLOOR_UPGRADE_COSTS[$mall.floors]
               click = ->do
                 $mall.money -= Mall::FLOOR_UPGRADE_COSTS[$mall.floors]
+                $mall.misc_entities << FloatingText.new(
+                  text: "-#{Utils.format_money(Mall::FLOOR_UPGRADE_COSTS[$mall.floors])}",
+                  colour: Gosu::Color::RED,
+                  position: $cursor,
+                )
                 $mall.floors += 1
                 open_main_menu
               end
@@ -197,6 +202,11 @@ module GosuGameJam3
             interests = click.interests
             click = ->do
               $mall.money -= cost
+              $mall.misc_entities << FloatingText.new(
+                text: "-#{Utils.format_money(cost)}",
+                colour: Gosu::Color::RED,
+                position: $cursor,
+              )
               $mall.popularity *= 1.25
               interests.each do |interest|
                 $mall.interest_reputation[interest] += 5
