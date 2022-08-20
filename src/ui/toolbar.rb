@@ -21,10 +21,11 @@ module GosuGameJam3
         on_click: -> { $state = State::Idle.new },
       )
       @sentiment_button = Button.new(
-        width: 50,
+        width: 200,
         height: 60,
-        text: "Snt.",
-        position: Point.new(WIDTH - 140, HEIGHT - TOOLBAR_HEIGHT + 80),
+        text: "Feedback",
+        tooltip: "View positive and negative feedback\nfrom your customers.",
+        position: Point.new(WIDTH - 400, HEIGHT - TOOLBAR_HEIGHT + 10),
         on_click: ->do
           unless $state.is_a?(State::SentimentReport)
             $state = State::SentimentReport.new
@@ -34,10 +35,11 @@ module GosuGameJam3
         end,
       )
       @customers_button = Button.new(
-        width: 50,
+        width: 200,
         height: 60,
-        text: "Cst.",
-        position: Point.new(WIDTH - 70, HEIGHT - TOOLBAR_HEIGHT + 80),
+        text: "Overview",
+        tooltip: "Check the number of customers in your\nmall, and their most common interests.",
+        position: Point.new(WIDTH - 400, HEIGHT - TOOLBAR_HEIGHT + 80),
         on_click: ->do
           unless $state.is_a?(State::CustomerReport)
             $state = State::CustomerReport.new
@@ -70,7 +72,7 @@ module GosuGameJam3
       $regular_font.draw_text(
         money_reading,
         WIDTH - money_width - 10,
-        HEIGHT - TOOLBAR_HEIGHT + 25,
+        HEIGHT - TOOLBAR_HEIGHT + 60,
         10,
         1,
         1,
