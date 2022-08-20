@@ -90,7 +90,7 @@ module GosuGameJam3
         sentiment_counts = sentiment_counts.sort_by { |_, (v, _)| v }.reverse.to_h
         spacing = $regular_font.height * 1.2
 
-        sentiment_counts.take(20).each.with_index do |(text, (count, kind)), i|
+        sentiment_counts.take(19).each.with_index do |(text, (count, kind)), i|
           $regular_font.draw_text(
             count.to_s,
             width_padding + 10, height_padding + 10 + i * spacing, 100,
